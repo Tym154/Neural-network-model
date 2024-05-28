@@ -6,7 +6,7 @@ using namespace std;
 vector<vector<vector<double>>> weights = {{{0.3, 0.1, -0.4},{-0.3, 0.1, 0.4}},{{0.6, -0.2},{-0.3, 0.2},{-0.7, 0.4}}}; //Storing the weights
 vector<vector<double>> nodeVal = {{1, 1},{0,0,0},{0,0}}; //Storning the node values
 
-//Dorward propagation function
+//Forward propagation function
 void forward_prop(vector<vector<vector<double>>> weights, vector<vector<double>>& nodeVal){
     for(int i = 0; i < weights.size(); i++){
         vector<double> temp(nodeVal[i+1].size(), 0.0);
