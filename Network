@@ -9,7 +9,16 @@
 using namespace std;
 
 vector<vector<vector<double>>> weights = {{{0.3, 0.1, -0.4},{-0.3, 0.1, 0.4}},{{0.6, -0.2},{-0.3, 0.2},{-0.7, 0.4}}}; //Storing the weights
-vector<vector<double>> nodeVal = {{0, 0},{0,0,0},{0,0}}; //Storning the node values
+vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
+
+//Sizing the layers
+void assign(){
+    vector<double> layerHid(16, 0), layerOut(10, 0);
+    nodeVal[0] = reading_data();
+    nodeVal[1] = layerHid;
+    nodeVal[2] = layerHid;
+    nodeVal[3] = layerOut;
+}
 
 //function to read the data from a csv file
 vector<double> reading_data(){
