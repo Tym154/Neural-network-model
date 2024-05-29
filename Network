@@ -3,16 +3,17 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
-#include <vector>
 #include <string>
+#include <random>
 
 using namespace std;
 
-vector<vector<vector<double>>> weights = {{{0.3, 0.1, -0.4},{-0.3, 0.1, 0.4}},{{0.6, -0.2},{-0.3, 0.2},{-0.7, 0.4}}}; //Storing the weights
+vector<vector<vector<double>>> weights(4); //Storing the weights
 vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
 
 
-//function to read the data from a csv file
+//Function to read the data line by line from csv file
+//and store it into a vector<double> to further process it
 vector<double> reading_data(){
     fstream data;
     data.open("data/data.csv");
@@ -30,7 +31,7 @@ vector<double> reading_data(){
 
     for(int i = 0; i < line.length(); i++){
        if(line[i] == ','){
-        rowData[index++] = stoi(temp);
+        rowData[index++] = stod(temp);
         temp = "";
        }
        else{
@@ -41,7 +42,8 @@ vector<double> reading_data(){
     return rowData;
 }
 
-//Sizing the layers
+
+//Function to resize the nodeVal so it stores the proper number of node values
 void assign(){
     vector<double> layerHid(16, 0), layerOut(10, 0);
     nodeVal[0] = reading_data();
@@ -50,15 +52,17 @@ void assign(){
     nodeVal[3] = layerOut;
 }
 
-//Activation function
+
+//Activation function (sigmoid function)
 double activation(double x){
     //using sigmoid
     return 1 / (1 + exp(-x));
 }
 
+
 //Forward propagation function
-void forward_prop(vector<vector<vector<double>>> weights, vector<vector<double>>& nodeVal){
-    for(int i = 0; i < weights.size(); i++){
+void forward_prop(vector<vector<vector<double>>>& weights, vector<vector<double>>& nodeVal){
+    for(int i = 0; i < weights.size() - 1; i++){
         vector<double> temp(nodeVal[i+1].size(), 0.0);
 
         for(int j = 0; j < weights[i].size(); j++){
@@ -75,15 +79,42 @@ void forward_prop(vector<vector<vector<double>>> weights, vector<vector<double>>
     }
 }
 
-//Just testing out the functions for now
-int main(){
-    assign();
 
-    for(double el : nodeVal[2]){
-        cout << el << "\n";
+//Assigning random values between -1 and 1 to weights at the begining of the training
+void randomWeights(){
+    random_device rd; // obtain a random number from hardware
+    mt19937 gen(rd()); // seed the generator
+    uniform_real_distribution<> distr(-1.0, 1.0);
+
+    for(int i = 0; i < nodeVal.size() - 1; i++){
+        weights[i].resize(nodeVal[i].size());
+
+        for(int j = 0; j < nodeVal[i].size(); j++){
+            weights[i][j].resize(nodeVal[i+1].size());
+
+            if(i < weights.size() - 1){
+                for(int k = 0; k < nodeVal[i+1].size(); k++){
+                    weights[i][j][k] = distr(gen);
+                }
+            }
+        }
     }
+}
 
+
+//Just testing the functions inside the main
+int main() {
+    assign();
+    randomWeights();
+    forward_prop(weights, nodeVal);
+
+    for(int i = 0; i < nodeVal.size(); i++){
+        cout << "layer:" << i << "\n";
+        for(int j = 0; j < nodeVal[i].size(); j++){
+            cout << nodeVal[i][j] << " ";
+        }
+        cout << "\n";
+    }
 
     return 0;
 }
-
