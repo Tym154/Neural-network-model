@@ -1,14 +1,48 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
 vector<vector<vector<double>>> weights = {{{0.3, 0.1, -0.4},{-0.3, 0.1, 0.4}},{{0.6, -0.2},{-0.3, 0.2},{-0.7, 0.4}}}; //Storing the weights
 vector<vector<double>> nodeVal = {{0, 0},{0,0,0},{0,0}}; //Storning the node values
 
+//function to read the data from a csv file
+vector<double> reading_data(){
+    fstream data;
+    data.open("data/data.csv");
+
+    if(!data.is_open()){
+        cout << "Error \n";
+    }
+
+    string line;
+    getline(data, line);
+
+    vector<double> rowData(784, 0);
+    string temp = "";
+    int index = 0;
+
+    for(int i = 0; i < line.length(); i++){
+       if(line[i] == ','){
+        rowData[index++] = stoi(temp);
+        temp = "";
+       }
+       else{
+        temp += line[i];
+       }
+    }
+
+    return rowData;
+}
+
 //Activation function
 double activation(double x){
+    //using sigmoid
     return 1 / (1 + exp(-x));
 }
 
