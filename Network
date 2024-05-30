@@ -8,6 +8,8 @@
 
 using namespace std;
 
+int label;
+
 vector<vector<vector<double>>> weights(4); //Storing the weights
 vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
 
@@ -16,7 +18,7 @@ vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
 //and store it into a vector<double> to further process it
 vector<double> reading_data(){
     fstream data;
-    data.open("data/data.csv");
+    data.open("data/mnist_train.csv");
 
     if(!data.is_open()){
         cout << "Error \n";
@@ -30,13 +32,18 @@ vector<double> reading_data(){
     int index = 0;
 
     for(int i = 0; i < line.length(); i++){
-       if(line[i] == ','){
-        rowData[index++] = stod(temp);
-        temp = "";
-       }
-       else{
-        temp += line[i];
-       }
+        if(line[i] == ',' && i == 1){
+            label = stod(temp);
+            temp = "";
+            continue;
+        }
+        if(line[i] == ','){
+            rowData[index++] = stod(temp);
+            temp = "";
+        }
+        else{
+            temp += line[i];
+        }
     }
 
     return rowData;
@@ -54,9 +61,13 @@ void assign(){
 
 
 //Activation function (sigmoid function)
-double activation(double x){
-    //using sigmoid
-    return 1 / (1 + exp(-x));
+//When the layer is hidden i use the Hyperbolic Tangent function
+//and if the layer is output u use the softmax function
+double activation(double x, int layer){
+    if(layer < weights.size() - 2){
+        return (2/(1+exp(-2*x))) - 1;
+    } //not done yet
+    return 0;
 }
 
 
@@ -72,7 +83,7 @@ void forward_prop(vector<vector<vector<double>>>& weights, vector<vector<double>
         }
 
         for(int k = 0; k < temp.size(); k++){
-            temp[k] = activation(temp[k]);
+            temp[k] = activation(temp[k], i);
         }
 
         nodeVal[i+1] = temp;
@@ -102,19 +113,54 @@ void randomWeights(){
 }
 
 
+
+double Loss(vector<double> out){
+    double loss = 0;
+
+    return loss;
+}
+
+
+void Display_nodeVals(){
+    int count = 0;
+    for(int i = 0; i < nodeVal.size(); i++){
+        cout << "\n\n" << "Leyer: " << i << "\n";
+        for(int j = 0; j < nodeVal[i].size(); j++){
+            cout << nodeVal[i][j] << " ";
+            count++;
+        }
+        cout << "\nNumber of nodes in layer: " <<   count <<"\n";
+        count = 0;
+    }
+}
+
+
+
+void Display_weights(){
+    int count = 0;
+    for(int i = 0; i < weights.size(); i++){
+        cout << "\n\n" << "Leyer: " << i << "\n";
+        for(int j = 0; j < weights[i].size(); j++){
+            for(int k = 0; k < weights[i][j].size(); k++){
+                cout << weights[i][j][k] << " ";
+                count++;
+            }
+        }
+        cout << "\nNumber of weights in layer: " <<count <<"\n\n";
+        count = 0;
+    }
+}
+
 //Just testing the functions inside the main
 int main() {
     assign();
     randomWeights();
     forward_prop(weights, nodeVal);
 
-    for(int i = 0; i < nodeVal.size(); i++){
-        cout << "layer:" << i << "\n";
-        for(int j = 0; j < nodeVal[i].size(); j++){
-            cout << nodeVal[i][j] << " ";
-        }
-        cout << "\n";
-    }
+    Display_nodeVals();
+    
+
+    cout << "    " << label;
 
     return 0;
 }
