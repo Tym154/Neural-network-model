@@ -60,14 +60,22 @@ void assign(){
 }
 
 
-//Activation function (sigmoid function)
-//When the layer is hidden i use the Hyperbolic Tangent function
-//and if the layer is output u use the softmax function
-double activation(double x, int layer){
-    if(layer < weights.size() - 2){
-        return (2/(1+exp(-2*x))) - 1;
-    } //not done yet
-    return 0;
+//When the layer is hidden i use the Leaky relu function
+double leaky_relu(double x){
+    return (x > 0) ? x : x * -0.001;
+}
+//and if the layer is output u use the softmax function (idk if this is right TvT)
+vector<double> softmax(vector<double> in){
+    double sum = 0.0;
+
+    for(double inputs : in){
+        sum += inputs;
+    }
+
+    for(int i = 0; i < in.size(); i++){
+        in[i] = in[i] / sum;
+    }
+    return in;
 }
 
 
@@ -83,11 +91,12 @@ void forward_prop(vector<vector<vector<double>>>& weights, vector<vector<double>
         }
 
         for(int k = 0; k < temp.size(); k++){
-            temp[k] = activation(temp[k], i);
+            temp[k] = leaky_relu(temp[k]);
         }
 
         nodeVal[i+1] = temp;
     }
+    nodeVal[nodeVal.size()-1] = softmax(nodeVal[nodeVal.size()-1]);
 }
 
 
@@ -112,13 +121,6 @@ void randomWeights(){
     }
 }
 
-
-
-double Loss(vector<double> out){
-    double loss = 0;
-
-    return loss;
-}
 
 
 void Display_nodeVals(){
