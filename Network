@@ -8,7 +8,7 @@
 
 using namespace std;
 
-int label;
+int label; //storing the label from the start of the csv file line
 
 vector<vector<vector<double>>> weights(4); //Storing the weights
 vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
