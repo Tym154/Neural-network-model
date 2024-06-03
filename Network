@@ -9,8 +9,8 @@
 
 using namespace std;
 
-int label;
-double check = 0.0;
+int label; //storing the label
+double check = 0.0; //testing double
 
 vector<vector<vector<double>>> weights(4); //Storing the weights
 vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
