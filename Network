@@ -5,10 +5,12 @@
 #include <sstream>
 #include <string>
 #include <random>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-int label; //storing the label from the start of the csv file line
+int label;
+double check = 0.0;
 
 vector<vector<vector<double>>> weights(4); //Storing the weights
 vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
@@ -60,20 +62,22 @@ void assign(){
 }
 
 
-//When the layer is hidden i use the Leaky relu function
+//Leaky relu for activation
 double leaky_relu(double x){
-    return (x > 0) ? x : x * -0.001;
+    return (x > 0) ? x : x * 0.01;
 }
-//and if the layer is output u use the softmax function (idk if this is right TvT)
+//Than using the softmax function to get distribution at the output layer
 vector<double> softmax(vector<double> in){
     double sum = 0.0;
+    double max = *max_element(in.begin(), in.end());
 
     for(double inputs : in){
-        sum += inputs;
+        sum += pow(inputs, 2);
     }
 
     for(int i = 0; i < in.size(); i++){
-        in[i] = in[i] / sum;
+        in[i] = pow(in[i], 2) / sum;
+        check += in[i];
     }
     return in;
 }
@@ -96,7 +100,7 @@ void forward_prop(vector<vector<vector<double>>>& weights, vector<vector<double>
 
         nodeVal[i+1] = temp;
     }
-    nodeVal[nodeVal.size()-1] = softmax(nodeVal[nodeVal.size()-1]);
+    nodeVal.back() = softmax(nodeVal.back());
 }
 
 
@@ -126,7 +130,7 @@ void randomWeights(){
 void Display_nodeVals(){
     int count = 0;
     for(int i = 0; i < nodeVal.size(); i++){
-        cout << "\n\n" << "Leyer: " << i << "\n";
+        cout << "\n\n" << "Layer: " << i << "\n";
         for(int j = 0; j < nodeVal[i].size(); j++){
             cout << nodeVal[i][j] << " ";
             count++;
@@ -141,7 +145,7 @@ void Display_nodeVals(){
 void Display_weights(){
     int count = 0;
     for(int i = 0; i < weights.size(); i++){
-        cout << "\n\n" << "Leyer: " << i << "\n";
+        cout << "\n\n" << "Layer: " << i << "\n";
         for(int j = 0; j < weights[i].size(); j++){
             for(int k = 0; k < weights[i][j].size(); k++){
                 cout << weights[i][j][k] << " ";
@@ -162,7 +166,7 @@ int main() {
     Display_nodeVals();
     
 
-    cout << "    " << label;
+    cout << "\nLabel: " << label << "\n";
 
     return 0;
 }
