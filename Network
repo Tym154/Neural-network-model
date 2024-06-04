@@ -9,9 +9,9 @@
 
 using namespace std;
 
-int label; //storing the label
-double check = 0.0; //testing double
+int label;
 
+vector<vector<double>> gradient(4);
 vector<vector<vector<double>>> weights(4); //Storing the weights
 vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
 
@@ -66,6 +66,14 @@ void assign(){
 double leaky_relu(double x){
     return (x > 0) ? x : x * 0.01;
 }
+
+
+
+double leaky_relu_derivative(double x){
+    return (x > 0) ? 1.0 : 0.01;
+}
+
+
 //Than using the softmax function to get distribution at the output layer
 vector<double> softmax(vector<double> in){
     double sum = 0.0;
@@ -77,7 +85,6 @@ vector<double> softmax(vector<double> in){
 
     for(int i = 0; i < in.size(); i++){
         in[i] = pow(in[i], 2) / sum;
-        check += in[i];
     }
     return in;
 }
@@ -157,6 +164,41 @@ void Display_weights(){
     }
 }
 
+
+//Function to calculate the error and the gradient of the output layer
+double error_output(vector<double> output){
+    double err = 0.0;
+    
+    for(int i = 0; i < output.size(); i++){
+
+        if(i != label){
+            err += pow(output[i], 2);
+            gradient[gradient.size()-1][i] = -output[i] * leaky_relu_derivative(nodeVal[nodeVal.size()-1][i]);
+        }
+        else{
+            err += pow(1 - output[i], 2);
+            gradient[gradient.size()-1][i] = (1 -output[i]) * leaky_relu_derivative(nodeVal[nodeVal.size()-1][i]);
+        }
+    }
+    return err;
+}
+
+
+
+double error_hiden(vector<double> hiden){
+    double err = 0.0;
+
+
+    return err;
+}
+
+
+//backpropagation algorithm
+void back_propagation(){
+    
+}   
+
+
 //Just testing the functions inside the main
 int main() {
     assign();
@@ -164,9 +206,16 @@ int main() {
     forward_prop(weights, nodeVal);
 
     Display_nodeVals();
-    
 
-    cout << "\nLabel: " << label << "\n";
+    cout << "\nLabel: " << error_output(nodeVal.back()) << "\n";
+
+    back_propagation();
+
+    forward_prop(weights, nodeVal);
+
+    Display_nodeVals();
+
+    cout << "\nLabel: " << error_output(nodeVal.back()) << "\n";
 
     return 0;
 }
