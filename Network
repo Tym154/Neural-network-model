@@ -9,213 +9,62 @@
 
 using namespace std;
 
-int label;
 
-vector<vector<double>> gradient(4);
-vector<vector<vector<double>>> weights(4); //Storing the weights
-vector<vector<double>> nodeVal = {{0},{0},{0},{0}}; //Storning the node values
+class Node{
+    public:
+    vector<double> weights; //weights on inputs
+    vector<double> inputs; //inputs to the node
+    double bias; //just... bias
+    double output; //activation
+    double value; //weighted input
 
+    //constructor for the node class
+    Node(int input_size){
+        random_device rd; //obtain a random number from hardware
+        mt19937 gen(rd()); //seed the generator
+        uniform_real_distribution<> distr(-1.0, 1.0); //random double between -1 and 1
 
-//Function to read the data line by line from csv file
-//and store it into a vector<double> to further process it
-vector<double> reading_data(){
-    fstream data;
-    data.open("data/mnist_train.csv");
-
-    if(!data.is_open()){
-        cout << "Error \n";
+        for(int i = 0; i < input_size; i++){
+            weights.push_back(distr(gen));
+        }
+        bias = (distr(gen));
     }
 
-    string line;
-    getline(data, line);
-
-    vector<double> rowData(784, 0);
-    string temp = "";
-    int index = 0;
-
-    for(int i = 0; i < line.length(); i++){
-        if(line[i] == ',' && i == 1){
-            label = stod(temp);
-            temp = "";
-            continue;
-        }
-        if(line[i] == ','){
-            rowData[index++] = stod(temp);
-            temp = "";
-        }
-        else{
-            temp += line[i];
-        }
+    //using leaky relu for the activation function in hidden layers
+    double activation(double x){
+        double alfa = 0.01;
+        return (x > 0) ? x : x * alfa;
     }
 
-    return rowData;
-}
-
-
-//Function to resize the nodeVal so it stores the proper number of node values
-void assign(){
-    vector<double> layerHid(16, 0), layerOut(10, 0);
-    nodeVal[0] = reading_data();
-    nodeVal[1] = layerHid;
-    nodeVal[2] = layerHid;
-    nodeVal[3] = layerOut;
-}
-
-
-//Leaky relu for activation
-double leaky_relu(double x){
-    return (x > 0) ? x : x * 0.01;
-}
-
-
-
-double leaky_relu_derivative(double x){
-    return (x > 0) ? 1.0 : 0.01;
-}
-
-
-//Than using the softmax function to get distribution at the output layer
-vector<double> softmax(vector<double> in){
-    double sum = 0.0;
-    double max = *max_element(in.begin(), in.end());
-
-    for(double inputs : in){
-        sum += pow(inputs, 2);
-    }
-
-    for(int i = 0; i < in.size(); i++){
-        in[i] = pow(in[i], 2) / sum;
-    }
-    return in;
-}
-
-
-//Forward propagation function
-void forward_prop(vector<vector<vector<double>>>& weights, vector<vector<double>>& nodeVal){
-    for(int i = 0; i < weights.size() - 1; i++){
-        vector<double> temp(nodeVal[i+1].size(), 0.0);
-
-        for(int j = 0; j < weights[i].size(); j++){
-            for(int k = 0; k < weights[i][j].size(); k++){
-                temp[k] += weights[i][j][k] * nodeVal[i][j];
-            }
+    //forward function
+    double forward(vector<double> x){ 
+        inputs = x; //storing the inputs for later
+        
+        for(int i = 0; i < x.size(); i++){ //summing up all the inputs * weight on the input
+            value += x[i] * weights[i];
         }
 
-        for(int k = 0; k < temp.size(); k++){
-            temp[k] = leaky_relu(temp[k]);
-        }
-
-        nodeVal[i+1] = temp;
+        value += bias; //adding the bias
+        output = activation(value); //getting the activation
+        return output;
     }
-    nodeVal.back() = softmax(nodeVal.back());
-}
-
-
-//Assigning random values between -1 and 1 to weights at the begining of the training
-void randomWeights(){
-    random_device rd; // obtain a random number from hardware
-    mt19937 gen(rd()); // seed the generator
-    uniform_real_distribution<> distr(-1.0, 1.0);
-
-    for(int i = 0; i < nodeVal.size() - 1; i++){
-        weights[i].resize(nodeVal[i].size());
-
-        for(int j = 0; j < nodeVal[i].size(); j++){
-            weights[i][j].resize(nodeVal[i+1].size());
-
-            if(i < weights.size() - 1){
-                for(int k = 0; k < nodeVal[i+1].size(); k++){
-                    weights[i][j][k] = distr(gen);
-                }
-            }
-        }
-    }
-}
+};
 
 
 
-void Display_nodeVals(){
-    int count = 0;
-    for(int i = 0; i < nodeVal.size(); i++){
-        cout << "\n\n" << "Layer: " << i << "\n";
-        for(int j = 0; j < nodeVal[i].size(); j++){
-            cout << nodeVal[i][j] << " ";
-            count++;
-        }
-        cout << "\nNumber of nodes in layer: " <<   count <<"\n";
-        count = 0;
-    }
-}
+class Layers{
+    public:
+};
 
 
 
-void Display_weights(){
-    int count = 0;
-    for(int i = 0; i < weights.size(); i++){
-        cout << "\n\n" << "Layer: " << i << "\n";
-        for(int j = 0; j < weights[i].size(); j++){
-            for(int k = 0; k < weights[i][j].size(); k++){
-                cout << weights[i][j][k] << " ";
-                count++;
-            }
-        }
-        cout << "\nNumber of weights in layer: " <<count <<"\n\n";
-        count = 0;
-    }
-}
+class Network{
+    public:
 
-
-//Function to calculate the error and the gradient of the output layer
-double error_output(vector<double> output){
-    double err = 0.0;
-    
-    for(int i = 0; i < output.size(); i++){
-
-        if(i != label){
-            err += pow(output[i], 2);
-            gradient[gradient.size()-1][i] = -output[i] * leaky_relu_derivative(nodeVal[nodeVal.size()-1][i]);
-        }
-        else{
-            err += pow(1 - output[i], 2);
-            gradient[gradient.size()-1][i] = (1 -output[i]) * leaky_relu_derivative(nodeVal[nodeVal.size()-1][i]);
-        }
-    }
-    return err;
-}
-
-
-
-double error_hiden(vector<double> hiden){
-    double err = 0.0;
-
-
-    return err;
-}
-
-
-//backpropagation algorithm
-void back_propagation(){
-    
-}   
+};
 
 
 //Just testing the functions inside the main
 int main() {
-    assign();
-    randomWeights();
-    forward_prop(weights, nodeVal);
 
-    Display_nodeVals();
-
-    cout << "\nLabel: " << error_output(nodeVal.back()) << "\n";
-
-    back_propagation();
-
-    forward_prop(weights, nodeVal);
-
-    Display_nodeVals();
-
-    cout << "\nLabel: " << error_output(nodeVal.back()) << "\n";
-
-    return 0;
 }
