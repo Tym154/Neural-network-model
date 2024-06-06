@@ -9,6 +9,7 @@
 
 using namespace std;
 
+int label;
 
 class Node{
     public:
@@ -48,6 +49,16 @@ class Node{
         output = activation(value); //getting the activation
         return output;
     }
+
+    //squared error function (cost function)
+    double squared_error(double prediction, int node){
+        if(node != label){
+            return pow((prediction), 2);
+        }
+        else{
+            return pow((prediction - 1), 2);
+        }
+    }
 };
 
 
@@ -66,5 +77,5 @@ class Network{
 
 //Just testing the functions inside the main
 int main() {
-
+    return 0;
 }
