@@ -14,10 +14,10 @@ int label;
 class Node{
     public:
     vector<double> weights; //weights on inputs
-    vector<double> inputs; //inputs to the node
-    double bias; //just... bias
-    double output; //activation
-    double value; //weighted input
+    vector<double> inputs;  //inputs to the node
+    double bias;            //just... bias
+    double output;          //activation
+    double value;           //weighted input
 
     //constructor for the node class
     Node(int input_size){
@@ -49,29 +49,28 @@ class Node{
         output = activation(value); //getting the activation
         return output;
     }
-
-    //squared error function (cost function)
-    double squared_error(double prediction, int node){
-        if(node != label){
-            return pow((prediction), 2);
-        }
-        else{
-            return pow((prediction - 1), 2);
-        }
-    }
 };
 
 
 
-class Layers{
+class Layer{
     public:
+    vector<Node> nodes;
+    
+    //layer constructor (just pushing back new node)
+    Layer(int num_nodes, int input_size){
+        for(int i = 0; i < num_nodes; i++){
+            nodes.emplace_back(Node(input_size));
+        }
+    }
+
 };
 
 
 
 class Network{
     public:
-
+    vector<Layer> layers;
 };
 
 
