@@ -88,6 +88,7 @@ class Network{
 
 //Just testing the functions inside the main
 int main() {
+    Network net({784, 16, 16, 10});
     return 0;
 }
 
