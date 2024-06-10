@@ -115,7 +115,7 @@ class Network{
                 cout << layers[i].nodes[j].bias << " ";
                 count++;
             }
-            cout << "\nNumber of biases:"<< count <<"\n\n"; 
+            cout << "\nNumber of biases (and nodes):"<< count <<"\n\n"; 
         }
     }
     ////////////////////////////////////////////////////
