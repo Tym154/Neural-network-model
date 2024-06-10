@@ -83,12 +83,35 @@ class Network{
             layers.emplace_back(Layer(num_nodes[i], num_nodes[i-1])); //adding the hidden layers and output layer
         }
     }
+
+    /////////////////testing functions//////////////////
+    void Display_weights(){
+        for(int i = 0; i < layers.size(); i++){ //iterating through layers
+            cout << "Layer: " << i << " ";
+            if(i == layers.size()-1) cout << "(output)"; //if the layer is last it is the output layer so i will cout that
+            cout << "\n";
+
+            for(int j = 0; j < layers[i].nodes.size(); j++){ //iterating through nodes
+                int count = 0; //reseting the counter of weights
+
+                for(int k = 0; k < layers[i].nodes[j].weights.size(); k++){ //iterating through weights
+                    cout << layers[i].nodes[j].weights[k] << "  ";
+                    count++; //counting the weights in a layer to check how many are connected to the node
+                }
+                cout << "\n\nnumber of weights: "<< count <<"\n\n\n";
+            }
+            cout << "\n\n\n\n"; 
+        }
+    }
+    ////////////////////////////////////////////////////
 };
 
 
 //Just testing the functions inside the main
 int main() {
     Network net({784, 16, 16, 10});
+    net.Display_weights();
+
     return 0;
 }
 
