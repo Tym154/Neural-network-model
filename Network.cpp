@@ -98,7 +98,7 @@ class Network{
                     cout << layers[i].nodes[j].weights[k] << "  ";
                     count++; //counting the weights in a layer to check how many are connected to the node
                 }
-                cout << "\n\nnumber of weights: "<< count <<"\n\n\n";
+                cout << "\n\nNumber of weights: "<< count <<"\n\n\n";
             }
             cout << "\n\n\n\n"; 
         }
@@ -106,13 +106,16 @@ class Network{
 
     void Display_bias(){
         for(int i = 0; i < layers.size(); i++){ //iterating through layers
+            int count = 0; //reseting the counter of biases
             cout << "Layer: " << i << " ";
             if(i == layers.size()-1) cout << "(output)"; //if the layer is last it is the output layer so i will cout that
             cout << "\n";
+
             for(int j = 0; j < layers[i].nodes.size(); j++){ //iterating through nodes
                 cout << layers[i].nodes[j].bias << " ";
+                count++;
             }
-            cout << "\n\n"; 
+            cout << "\n\nNumber of biases:"<< count <<"\n\n"; 
         }
     }
     ////////////////////////////////////////////////////
