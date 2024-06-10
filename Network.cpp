@@ -98,7 +98,7 @@ class Network{
                     cout << layers[i].nodes[j].weights[k] << "  ";
                     count++; //counting the weights in a layer to check how many are connected to the node
                 }
-                cout << "\n\nNumber of weights: "<< count <<"\n\n\n";
+                cout << "\nNumber of weights: "<< count <<"\n\n";
             }
             cout << "\n\n\n\n"; 
         }
@@ -115,7 +115,7 @@ class Network{
                 cout << layers[i].nodes[j].bias << " ";
                 count++;
             }
-            cout << "\n\nNumber of biases:"<< count <<"\n\n"; 
+            cout << "\nNumber of biases:"<< count <<"\n\n"; 
         }
     }
     ////////////////////////////////////////////////////
