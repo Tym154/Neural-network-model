@@ -103,6 +103,18 @@ class Network{
             cout << "\n\n\n\n"; 
         }
     }
+
+    void Display_bias(){
+        for(int i = 0; i < layers.size(); i++){ //iterating through layers
+            cout << "Layer: " << i << " ";
+            if(i == layers.size()-1) cout << "(output)"; //if the layer is last it is the output layer so i will cout that
+            cout << "\n";
+            for(int j = 0; j < layers[i].nodes.size(); j++){ //iterating through nodes
+                cout << layers[i].nodes[j].bias << " ";
+            }
+            cout << "\n\n"; 
+        }
+    }
     ////////////////////////////////////////////////////
 };
 
@@ -110,7 +122,7 @@ class Network{
 //Just testing the functions inside the main
 int main() {
     Network net({784, 16, 16, 10});
-    net.Display_weights();
+    net.Display_bias();
 
     return 0;
 }
