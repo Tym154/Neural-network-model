@@ -98,6 +98,9 @@ class Network{
                 cost += pow(layers.back().nodes[i].output - label, 2);
             }
         }
+        cost = cost * (1/layers.back().nodes.size());
+
+        layers.back().cost = cost;
     }
 
     /////////////////testing functions//////////////////
