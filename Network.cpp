@@ -59,6 +59,7 @@ class Node{
 class Layer{
     public:
     vector<Node> nodes;
+    double cost;
     
     //layer constructor (just pushing back new node)
     Layer(int num_nodes, int input_size){
@@ -81,6 +82,21 @@ class Network{
 
         for(int i = 1; i < num_nodes.size(); i++){
             layers.emplace_back(Layer(num_nodes[i], num_nodes[i-1])); //adding the hidden layers and output layer
+        }
+    }
+
+
+    //Cost function
+    void cost(){
+        double cost = 0;
+        for(int i = 0; i < layers.back().nodes.size(); i++){ //iterating through the output layer
+            if(i != label){
+                cost += pow(layers.back().nodes[i].output, 2);
+            }
+
+            else{
+                cost += pow(layers.back().nodes[i].output - label, 2);
+            }
         }
     }
 
