@@ -9,7 +9,15 @@
 
 using namespace std;
 
-int label;
+vector<int> label;
+vector<vector<int>> data;
+int cycle = 0;
+
+//reading the data from a csv file and storing it into a 2D array
+void reading_data(){
+    vector<int> tempVec(784, 0);
+    ifstream CSVdata("../mnist_train.csv"); //making this func in the Testing.cpp file
+}
 
 class Node{
     public:
@@ -86,18 +94,20 @@ class Network{
     }
 
 
-    //Cost function
+    //Cost function (MSE)
     void cost(){
         double cost = 0;
         for(int i = 0; i < layers.back().nodes.size(); i++){ //iterating through the output layer
-            if(i != label){
+            if(i != label[cycle]){ 
                 cost += pow(layers.back().nodes[i].output, 2);
             }
 
             else{
-                cost += pow(layers.back().nodes[i].output - label, 2);
+                cost += pow(layers.back().nodes[i].output - label[cycle], 2);
             }
         }
+        cycle++; //counting the cycles
+
         cost = cost * (1/layers.back().nodes.size());
 
         layers.back().cost = cost;
@@ -143,8 +153,6 @@ class Network{
 
 //Just testing the functions inside the main
 int main() {
-    Network net({784, 16, 16, 10});
-    net.Display_bias();
 
     return 0;
 }
