@@ -10,13 +10,28 @@
 using namespace std;
 
 vector<int> label;
-vector<vector<int>> data;
+vector<vector<int>> data_from_csv;
 int cycle = 0;
 
 //reading the data from a csv file and storing it into a 2D array
 void reading_data(){
-    vector<int> tempVec(784, 0);
-    ifstream CSVdata("../mnist_train.csv"); //making this func in the Testing.cpp file
+    ifstream CSVdata("../mnist_train.csv");
+    string line;
+    string temp;
+
+    while(getline(CSVdata, line)){
+        stringstream row(line);
+
+        getline(row, temp, ',');
+        label.push_back(stoi(temp));
+
+        vector<int> tempVector;
+        while(getline(row, temp, ',')){
+            tempVector.push_back(stoi(temp));
+        }
+
+        data_from_csv.push_back(tempVector);
+    }
 }
 
 class Node{
@@ -153,7 +168,7 @@ class Network{
 
 //Just testing the functions inside the main
 int main() {
-
+    reading_data();
     return 0;
 }
 
