@@ -26,7 +26,7 @@ void reading_data(){
         label.push_back(stoi(temp));
 
         vector<int> tempVector;
-        
+
         while(getline(row, temp, ',')){
             tempVector.push_back(stoi(temp));
         }
@@ -183,8 +183,10 @@ void Display_data(){
     int count_of_elements = 0;
     int count_of_lines = 0;
 
-    for(vector<int> line : data_from_csv){
-        cout << "\n\n\n";
+    for(int i = 0; i < data_from_csv.size(); i++){
+        vector<int> line = data_from_csv[i];
+
+        cout << "\n\n\nLabel for this data: " << label[i] << "\n\n";
 
         for(int num : line){
             cout << " " << num;
@@ -204,6 +206,7 @@ void Display_data(){
 //Just testing the functions inside the main
 int main() { 
     reading_data();
+    Display_data();
     return 0;
 }
 
