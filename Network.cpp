@@ -9,8 +9,9 @@
 
 using namespace std;
 
-vector<int> label;
-vector<vector<int>> data_from_csv;
+vector<int> label; // labels
+vector<vector<int>> expected_outputs;
+vector<vector<int>> data_from_csv; //data converted from a csv file
 int cycle = 0;
 
 //reading the data from a csv file and storing it into a 2D array
@@ -35,6 +36,22 @@ void reading_data(){
     }
 }
 
+//preparing expected_output from label
+void expect(){
+    for(int i = 0; i < label.size(); i++){
+        vector<int> temp(10, 0);
+
+        for(int j = 0; j < 10; j++){
+            if(label[i] == j){
+                temp[j] == i;
+                break;
+            }
+        }
+
+        expected_outputs.push_back(temp);
+    }
+}
+
 class Node{
     public:
     vector<double> weights; //weights on inputs
@@ -42,6 +59,7 @@ class Node{
     double bias;            //just... bias
     double output;          //activation
     double value;           //weighted input
+    double delta;           //delta for backpropagation
 
     //constructor for the node class
     Node(int input_size){
@@ -62,6 +80,12 @@ class Node{
     double activation(double x){
         double alfa = 0.01;
         return (x > 0) ? x : x * alfa;
+    }
+
+    //derivative of the leaky relu function;
+    double activation_derivative(double x){
+        double alfa = 0.01;
+        return (x > 0) ? 1 : alfa;
     }
 
     //forward function
@@ -129,6 +153,44 @@ class Network{
         cost = cost * (1/layers.back().nodes.size());
 
         layers.back().cost = cost;
+    }
+
+    //backpropagation
+    void backpropagate(double learning_rate, vector<int> expected_output){
+
+        //output layer deltas
+        for(int i = 0; i < layers.back().nodes.size(); i++){
+            Node &node = layers.back().nodes[i];
+            double error = node.output - expected_output[i];
+            node.delta = error * node.activation_derivative(node.value);
+        }
+
+        //hidden layer deltas
+        for(int i = layers.size() - 2; i >= 0; i--){
+            for(int j = 0; j < layers[i].nodes.size(); j++){
+                Node &node = layers[i].nodes[j];
+                double error;
+                
+                for(int k = 0; k < layers[i+1].nodes.size(); k++){
+                    error = layers[i+1].nodes[k].delta * layers[i+1].nodes[k].weights[j];
+                }
+
+                node.delta = error * node.activation_derivative(node.value);
+            }
+        }
+
+        //updating weights and biases
+        for(int i = 1; i < layers.size(); i++){
+            for(int j = 0; j < layers[i].nodes.size(); j++){
+                Node &node = layers[i].nodes[j];
+
+                for(int k = 0; k < node.weights.size(); k++){
+                    node.weights[k] -= node.delta * learning_rate * node.inputs[k];
+                }
+
+                node.bias -= learning_rate * node.delta;
+            }
+        }
     }
 
     /////////////////testing functions//////////////////
@@ -206,7 +268,7 @@ void Display_data(){
 //Just testing the functions inside the main
 int main() { 
     reading_data();
-    Display_data();
+    expect();
     return 0;
 }
 
