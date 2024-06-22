@@ -87,19 +87,6 @@ class Node{
         double alfa = 0.01;
         return (x > 0) ? 1 : alfa;
     }
-
-    //forward function
-    double forward(vector<double> x){ 
-        inputs = x; //storing the inputs for later
-        
-        for(int i = 0; i < x.size(); i++){ //summing up all the inputs * weight on the input
-            value += x[i] * weights[i];
-        }
-
-        value += bias; //adding the bias
-        output = activation(value); //getting the activation
-        return output;
-    }
 };
 
 
@@ -153,6 +140,27 @@ class Network{
         cost = cost * (1/layers.back().nodes.size());
 
         layers.back().cost = cost;
+    }
+
+    //forward function
+    void forward_propagation(){
+        //iterating throught layers
+        for(int i = 1; i < layers.size(); i++){
+            
+            //iterating throught nodes
+            for(int j = 0; j < layers[i].nodes.size(); j++){
+                Node &node = layers[i].nodes[j];
+                node.value = 0;
+
+                //iterating throught weights connected to node
+                for(int k = 0; k < node.weights.size(); k++){
+                    node.value += node.weights[k] * layers[i-1].nodes[k].output; //adding up all the weighted inputs
+                }
+
+                node.value += node.bias;
+                node.output = node.activation(node.value);
+            }
+        }
     }
 
     //backpropagation
@@ -266,9 +274,13 @@ void Display_data(){
 
 
 //Just testing the functions inside the main
-int main() { 
+int main() {
+    double learning_rate = 0.001;
+    Network network({784, 100, 100, 100, 100, 10});
+
     reading_data();
     expect();
+    network.forward_propagation();
     return 0;
 }
 
