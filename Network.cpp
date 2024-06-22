@@ -26,6 +26,7 @@ void reading_data(){
         label.push_back(stoi(temp));
 
         vector<int> tempVector;
+        
         while(getline(row, temp, ',')){
             tempVector.push_back(stoi(temp));
         }
@@ -112,6 +113,7 @@ class Network{
     //Cost function (MSE)
     void cost(){
         double cost = 0;
+
         for(int i = 0; i < layers.back().nodes.size(); i++){ //iterating through the output layer
             if(i != label[cycle]){ 
                 cost += pow(layers.back().nodes[i].output, 2);
@@ -121,6 +123,7 @@ class Network{
                 cost += pow(layers.back().nodes[i].output - label[cycle], 2);
             }
         }
+
         cycle++; //counting the cycles
 
         cost = cost * (1/layers.back().nodes.size());
@@ -131,6 +134,7 @@ class Network{
     /////////////////testing functions//////////////////
     void Display_weights(){
         for(int i = 0; i < layers.size(); i++){ //iterating through layers
+
             cout << "Layer: " << i << " ";
             if(i == layers.size()-1) cout << "(output)"; //if the layer is last it is the output layer so i will cout that
             cout << "\n";
@@ -142,16 +146,22 @@ class Network{
                     cout << layers[i].nodes[j].weights[k] << "  ";
                     count++; //counting the weights in a layer to check how many are connected to the node
                 }
+
                 cout << "\nNumber of weights: "<< count <<"\n\n";
             }
+
             cout << "\n\n\n\n"; 
+
         }
     }
 
     void Display_bias(){
         for(int i = 0; i < layers.size(); i++){ //iterating through layers
+
             int count = 0; //reseting the counter of biases
+
             cout << "Layer: " << i << " ";
+
             if(i == layers.size()-1) cout << "(output)"; //if the layer is last it is the output layer so i will cout that
             cout << "\n";
 
@@ -159,6 +169,7 @@ class Network{
                 cout << layers[i].nodes[j].bias << " ";
                 count++;
             }
+
             cout << "\nNumber of biases (and nodes):"<< count <<"\n\n"; 
         }
     }
@@ -166,8 +177,32 @@ class Network{
 };
 
 
+////////////////////testing functions////////////////////
+void Display_data(){
+
+    int count_of_elements = 0;
+    int count_of_lines = 0;
+
+    for(vector<int> line : data_from_csv){
+        cout << "\n\n\n";
+
+        for(int num : line){
+            cout << " " << num;
+            count_of_elements++;
+        }
+
+        cout << "\nNUmber of values" << count_of_elements;
+        count_of_elements = 0;
+        count_of_lines++;
+    }
+
+    cout << "\n\nCount of lines:" << count_of_lines;
+}
+//////////////////////////////////////////////////////////
+
+
 //Just testing the functions inside the main
-int main() {
+int main() { 
     reading_data();
     return 0;
 }
