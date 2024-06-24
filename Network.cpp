@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 #include <random>
-#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -43,7 +42,7 @@ void expect(){
 
         for(int j = 0; j < 10; j++){
             if(label[i] == j){
-                temp[j] == i;
+                temp[j] = 1;
                 break;
             }
         }
@@ -51,6 +50,7 @@ void expect(){
         expected_outputs.push_back(temp);
     }
 }
+
 
 class Node{
     public:
@@ -70,7 +70,7 @@ class Node{
         for(int i = 0; i < input_size; i++){ //setting random number between 1 and -1 for weights and a bias
             weights.push_back(distr(gen));
         }
-        bias = (distr(gen));
+        bias = distr(gen);
 
         value = 0.0; //reseting the values to 0 so they dont acumulate when learning
         output = 0.0;
@@ -99,7 +99,7 @@ class Layer{
     //layer constructor (just pushing back new node)
     Layer(int num_nodes, int input_size){
         for(int i = 0; i < num_nodes; i++){
-            nodes.emplace_back(Node(input_size));
+            nodes.emplace_back(Node(input_size)); 
         }
     }
 
@@ -113,7 +113,7 @@ class Network{
 
     //Network constructor
     Network(vector<int> num_nodes){
-        layers.emplace_back(Layer(num_nodes[0], num_nodes[0])); //adding the input layer
+        layers.emplace_back(Layer(num_nodes[0], 0)); //adding the input layer
 
         for(int i = 1; i < num_nodes.size(); i++){
             layers.emplace_back(Layer(num_nodes[i], num_nodes[i-1])); //adding the hidden layers and output layer
@@ -125,19 +125,13 @@ class Network{
     void cost(){
         double cost = 0;
 
-        for(int i = 0; i < layers.back().nodes.size(); i++){ //iterating through the output layer
-            if(i != label[cycle]){ 
-                cost += pow(layers.back().nodes[i].output, 2);
-            }
-
-            else{
-                cost += pow(layers.back().nodes[i].output - label[cycle], 2);
-            }
+        for(int i = 0; i < layers.back().nodes.size(); i++){
+            cost += pow(layers.back().nodes[i].output - expected_outputs[cycle][i], 2);
         }
 
         cycle++; //counting the cycles
 
-        cost = cost * (1/layers.back().nodes.size());
+        cost = cost / layers.back().nodes.size();
 
         layers.back().cost = cost;
     }
@@ -177,7 +171,7 @@ class Network{
         for(int i = layers.size() - 2; i >= 0; i--){
             for(int j = 0; j < layers[i].nodes.size(); j++){
                 Node &node = layers[i].nodes[j];
-                double error;
+                double error = 0;
                 
                 for(int k = 0; k < layers[i+1].nodes.size(); k++){
                     error = layers[i+1].nodes[k].delta * layers[i+1].nodes[k].weights[j];
@@ -193,7 +187,7 @@ class Network{
                 Node &node = layers[i].nodes[j];
 
                 for(int k = 0; k < node.weights.size(); k++){
-                    node.weights[k] -= node.delta * learning_rate * node.inputs[k];
+                    node.weights[k] -= node.delta * learning_rate * layers[i-1].nodes[k].output;
                 }
 
                 node.bias -= learning_rate * node.delta;
@@ -202,7 +196,7 @@ class Network{
     }
 
     /////////////////testing functions//////////////////
-    void Display_weights(){
+    void Display_weights(){ 
         for(int i = 0; i < layers.size(); i++){ //iterating through layers
 
             cout << "Layer: " << i << " ";
@@ -272,17 +266,29 @@ void Display_data(){
 }
 //////////////////////////////////////////////////////////
 
-
 //Just testing the functions inside the main
 int main() {
-    double learning_rate = 0.001;
-    Network network({784, 100, 100, 100, 100, 10});
+    int count;
+    double learning_rate = 0.00001;
+    Network network({784, 100, 100, 100, 10});
 
     reading_data();
     expect();
-    network.forward_propagation();
-    return 0;
-}
+
+    for(int i = 0; i < 100; i++){
+            for(int i = 0; i < 60000; i++){
+            for(int i = 0; i < network.layers[0].nodes.size(); i++){
+                network.layers[0].nodes[i].value = data_from_csv[cycle][i];
+            }
+
+            network.forward_propagation();
+            network.cost();
+            cout << "\n \n" << network.layers.back().cost;
+            network.backpropagate(learning_rate, expected_outputs[i]);
+        }
+        cycle = 0;
+    }
+}   
 
 
 //help, really
