@@ -139,6 +139,12 @@ class Network{
     //forward function
     void forward_propagation(){
         //iterating throught layers
+        for(int i = 0; i < layers[0].nodes.size(); i++){
+            Node &node = layers[0].nodes[i];
+            node.value = data_from_csv[cycle][i];
+            node.output = node.activation(node.output);
+        }
+
         for(int i = 1; i < layers.size(); i++){
             
             //iterating throught nodes
@@ -275,18 +281,11 @@ int main() {
     reading_data();
     expect();
 
-    for(int i = 0; i < 100; i++){
-            for(int i = 0; i < 60000; i++){
-            for(int i = 0; i < network.layers[0].nodes.size(); i++){
-                network.layers[0].nodes[i].value = data_from_csv[cycle][i];
-            }
-
-            network.forward_propagation();
-            network.cost();
-            cout << "\n \n" << network.layers.back().cost;
-            network.backpropagate(learning_rate, expected_outputs[i]);
-        }
-        cycle = 0;
+    for(int i = 0; i < 10000; i++){
+    network.forward_propagation();
+    network.cost();
+    cout << "\n \n" << network.layers.back().cost;
+    network.backpropagate(learning_rate, expected_outputs[i]);
     }
 }   
 
