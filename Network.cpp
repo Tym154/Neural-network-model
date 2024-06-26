@@ -65,7 +65,7 @@ class Node{
     Node(int input_size){
         random_device rd; //obtain a random number from hardware
         mt19937 gen(rd()); //seed the generator
-        uniform_real_distribution<> distr(-1.0, 1.0); //random double between -1 and 1
+        uniform_real_distribution<> distr(-0.5, 0.5); //random double between -1 and 1
 
         for(int i = 0; i < input_size; i++){ //setting random number between 1 and -1 for weights and a bias
             weights.push_back(distr(gen));
@@ -122,14 +122,12 @@ class Network{
 
 
     //Cost function (MSE)
-    void cost(){
+    void calculate_cost(){
         double cost = 0;
 
         for(int i = 0; i < layers.back().nodes.size(); i++){
             cost += pow(layers.back().nodes[i].output - expected_outputs[cycle][i], 2);
         }
-
-        cycle++; //counting the cycles
 
         cost = cost / layers.back().nodes.size();
 
@@ -138,13 +136,13 @@ class Network{
 
     //forward function
     void forward_propagation(){
-        //iterating throught layers
+        //assigning first layer the data from scv file
         for(int i = 0; i < layers[0].nodes.size(); i++){
             Node &node = layers[0].nodes[i];
-            node.value = data_from_csv[cycle][i];
-            node.output = node.activation(node.output);
+            node.output = data_from_csv[cycle][i] / 255;
         }
 
+        //iterating throught layers
         for(int i = 1; i < layers.size(); i++){
             
             //iterating throught nodes
@@ -164,12 +162,12 @@ class Network{
     }
 
     //backpropagation
-    void backpropagate(double learning_rate, vector<int> expected_output){
+    void backpropagate(double learning_rate){
 
         //output layer deltas
         for(int i = 0; i < layers.back().nodes.size(); i++){
             Node &node = layers.back().nodes[i];
-            double error = node.output - expected_output[i];
+            double error = node.output - expected_outputs[cycle][i];
             node.delta = error * node.activation_derivative(node.value);
         }
 
@@ -180,7 +178,7 @@ class Network{
                 double error = 0;
                 
                 for(int k = 0; k < layers[i+1].nodes.size(); k++){
-                    error = layers[i+1].nodes[k].delta * layers[i+1].nodes[k].weights[j];
+                    error += layers[i+1].nodes[k].delta * layers[i+1].nodes[k].weights[j];
                 }
 
                 node.delta = error * node.activation_derivative(node.value);
@@ -193,13 +191,13 @@ class Network{
                 Node &node = layers[i].nodes[j];
 
                 for(int k = 0; k < node.weights.size(); k++){
-                    node.weights[k] -= node.delta * learning_rate * layers[i-1].nodes[k].output;
+                    node.weights[k] -= learning_rate * node.delta * layers[i-1].nodes[k].output;
                 }
 
                 node.bias -= learning_rate * node.delta;
             }
         }
-    }
+    } 
 
     /////////////////testing functions//////////////////
     void Display_weights(){ 
@@ -209,7 +207,7 @@ class Network{
             if(i == layers.size()-1) cout << "(output)"; //if the layer is last it is the output layer so i will cout that
             cout << "\n";
 
-            for(int j = 0; j < layers[i].nodes.size(); j++){ //iterating through nodes
+            for(int j = 1; j < layers[i].nodes.size(); j++){ //iterating through nodes
                 int count = 0; //reseting the counter of weights
 
                 for(int k = 0; k < layers[i].nodes[j].weights.size(); k++){ //iterating through weights
@@ -276,17 +274,23 @@ void Display_data(){
 int main() {
     int count;
     double learning_rate = 0.00001;
-    Network network({784, 100, 100, 100, 10});
+    Network network({784, 100, 100, 10});
 
     reading_data();
     expect();
 
-    for(int i = 0; i < 10000; i++){
-    network.forward_propagation();
-    network.cost();
-    cout << "\n \n" << network.layers.back().cost;
-    network.backpropagate(learning_rate, expected_outputs[i]);
+    for(int i = 0; i < 10; i++){
+        for(cycle = 0; cycle < 60000; cycle++){
+            network.forward_propagation();
+            network.calculate_cost();
+            cout << "Node value: " << network.layers.back().nodes[0].value << "\n";
+            cout << "Node output: " << network.layers.back().nodes[0].output << "\n";
+            cout << "\n \n" << network.layers.back().cost;
+            cout << "\n\n\n";
+            network.backpropagate(learning_rate);
+        }
     }
+
 }   
 
 
