@@ -134,6 +134,23 @@ class Network{
         layers.back().cost = cost;
     }
 
+    //softmax function
+    vector<double> softmax(vector<double> input){
+        double sum = 0;
+        
+        for(double in : input){
+            sum += in;
+        }
+
+        vector<double> output;
+
+        for(double in : input){
+            output.push_back(in / sum);
+        }
+
+        return output;
+    }
+
     //forward function
     void forward_propagation(){
         //assigning first layer the data from scv file
@@ -158,6 +175,18 @@ class Network{
                 node.value += node.bias;
                 node.output = node.activation(node.value);
             }
+        }
+
+        vector<double> output_values;
+        
+        for(Node &node : layers.back().nodes){
+            output_values.push_back(node.output);
+        }
+
+        output_values = softmax(output_values);
+
+        for(int i = 0; i < output_values.size(); i++){
+            layers.back().nodes[i].output = output_values[i];
         }
     }
 
@@ -273,13 +302,13 @@ void Display_data(){
 //Just testing the functions inside the main
 int main() {
     int count;
-    double learning_rate = 0.00001;
-    Network network({784, 100, 100, 10});
+    double learning_rate = 0.001;
+    Network network({784, 100, 100, 100, 100, 10});
 
     reading_data();
     expect();
 
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 20; i++){
         for(cycle = 0; cycle < 60000; cycle++){
             network.forward_propagation();
             network.calculate_cost();
