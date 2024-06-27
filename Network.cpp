@@ -39,14 +39,7 @@ void reading_data(){
 void expect(){
     for(int i = 0; i < label.size(); i++){
         vector<int> temp(10, 0);
-
-        for(int j = 0; j < 10; j++){
-            if(label[i] == j){
-                temp[j] = 1;
-                break;
-            }
-        }
-
+        temp[label[i]] = 1;
         expected_outputs.push_back(temp);
     }
 }
@@ -126,7 +119,7 @@ class Network{
         double cost = 0;
 
         for(int i = 0; i < layers.back().nodes.size(); i++){
-            cost += pow(layers.back().nodes[i].output - expected_outputs[cycle][i], 2);
+            cost += exp(layers.back().nodes[i].output - expected_outputs[cycle][i]);
         }
 
         cost = cost / layers.back().nodes.size();
@@ -136,9 +129,15 @@ class Network{
 
     //softmax function
     vector<double> softmax(vector<double> input){
+        double max_input = INT64_MIN;
         double sum = 0;
-        
+
         for(double in : input){
+            max_input = max(in, max_input);
+        }
+        
+        for(double &in : input){
+            in = exp(in - max_input);
             sum += in;
         }
 
@@ -302,22 +301,23 @@ void Display_data(){
 //Just testing the functions inside the main
 int main() {
     int count;
-    double learning_rate = 0.001;
-    Network network({784, 100, 100, 100, 100, 10});
+    double learning_rate = 0.01;
+    Network network({784, 100, 100, 100, 10});
 
     reading_data();
     expect();
 
-    for(int i = 0; i < 20; i++){
-        for(cycle = 0; cycle < 60000; cycle++){
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < data_from_csv.size(); j++){
             network.forward_propagation();
             network.calculate_cost();
-            cout << "Node value: " << network.layers.back().nodes[0].value << "\n";
-            cout << "Node output: " << network.layers.back().nodes[0].output << "\n";
-            cout << "\n \n" << network.layers.back().cost;
-            cout << "\n\n\n";
             network.backpropagate(learning_rate);
+            cycle++;
         }
+        cycle = 0;
+        cout << "Label was: " << label[cycle] << "  Certanity on the output was: " << network.layers.back().nodes[label[cycle]].output;
+        cout << "\nCost: " << network.layers.back().cost;
+        cout << "\n\n\n";
     }
 
 }   
