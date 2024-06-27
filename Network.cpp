@@ -123,7 +123,7 @@ class Network{
         }
 
         cost = cost / layers.back().nodes.size();
-
+        
         layers.back().cost = cost;
     }
 
@@ -209,7 +209,7 @@ class Network{
                     error += layers[i+1].nodes[k].delta * layers[i+1].nodes[k].weights[j];
                 }
 
-                node.delta = error * node.activation_derivative(node.value);
+                node.delta = error * node.activation_derivative(node.value);    
             }
         }
 
@@ -301,20 +301,21 @@ void Display_data(){
 //Just testing the functions inside the main
 int main() {
     int count;
-    double learning_rate = 0.01;
+    double learning_rate = 0.0001;
     Network network({784, 100, 100, 100, 10});
 
     reading_data();
     expect();
 
-    for(int i = 0; i < 2; i++){
-        for(int j = 0; j < data_from_csv.size(); j++){
+    for(int i = 0; i < 100; i++){
+        for(int j = 0; j < 5000; j++){
             network.forward_propagation();
             network.calculate_cost();
             network.backpropagate(learning_rate);
             cycle++;
         }
         cycle = 0;
+        network.Display_bias();
         cout << "Label was: " << label[cycle] << "  Certanity on the output was: " << network.layers.back().nodes[label[cycle]].output;
         cout << "\nCost: " << network.layers.back().cost;
         cout << "\n\n\n";
